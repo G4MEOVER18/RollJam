@@ -216,7 +216,7 @@ int32_t rolljam_app(void* p) {
     app->rf_mode   = RF_MODE_IDLE;
     strncpy(app->status, "Ready", sizeof(app->status) - 1);
 
-    rolljam_rf_init(app);
+    rolljam_rf_init(app);  // sets app->device = NULL on failure
 
     // GUI
     ViewPort* vp = view_port_alloc();
@@ -230,6 +230,14 @@ int32_t rolljam_app(void* p) {
     // MAIN LOOP
     // -----------------------------------------------------------------------
     while(!app->abort) {
+        // Guard: block RF states if CC1101 unavailable
+        if(!app->device && app->state != ROLLJAM_IDLE && app->state != ROLLJAM_DONE) {
+            snprintf(app->status, sizeof(app->status), "ERR: CC1101 not found");
+            app->state = ROLLJAM_IDLE;
+            view_port_update(vp);
+            furi_delay_ms(50);
+        }
+
         switch(app->state) {
 
         // -------- IDLE --------
