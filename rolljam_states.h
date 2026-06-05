@@ -1,0 +1,10 @@
+#pragma once
+
+typedef enum {
+    ROLLJAM_IDLE,
+    ROLLJAM_PHASE1_JAMMING,
+    ROLLJAM_CAPTURED,
+    ROLLJAM_PHASE2_JAMMING,
+    ROLLJAM_PHASE3_REPLAY,
+    ROLLJAM_DONE,
+} RollJamState;

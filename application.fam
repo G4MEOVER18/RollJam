@@ -1,0 +1,13 @@
+App(
+    appid="rolljam_research",
+    name="RollJam Research",
+    apptype=FlipperAppType.EXTERNAL,
+    targets=["f7"],
+    entry_point="rolljam_app",
+    stack_size=4 * 1024,
+    fap_category="Sub-GHz",
+    fap_description="RollJam PoC — educational rolling code capture & replay demo",
+    fap_version=(1, 0),
+    fap_author="G4MEOVER18",
+    fap_weburl="https://github.com/G4MEOVER18",
+)
