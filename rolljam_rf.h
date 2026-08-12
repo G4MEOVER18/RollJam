@@ -12,6 +12,8 @@ void rolljam_jam_stop(RollJamApp* app);
 
 // Raw signal capture via async RX
 void rolljam_capture_start(RollJamApp* app, RollJamSignal* sig);
+void rolljam_capture_pause(RollJamApp* app); // RX anhalten, Puffer behalten
+void rolljam_capture_resume(RollJamApp* app); // RX fortsetzen, Puffer behalten
 void rolljam_capture_stop(RollJamApp* app);
 bool rolljam_capture_done(const RollJamSignal* sig);
 

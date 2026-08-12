@@ -148,6 +148,7 @@ static bool rj_run_jam_capture_phase(
     sig->count = 0;
     sig->ready = false;
     app->rf_mode = RF_MODE_IDLE;
+    bool cap_started = false; // Puffer-Reset nur beim ersten RX-Fenster dieser Phase
 
     while(!app->abort) {
         uint32_t elapsed = (uint32_t)furi_get_tick() - app->phase_start;
@@ -163,11 +164,16 @@ static bool rj_run_jam_capture_phase(
         if(want_rx) {
             if(app->rf_mode != RF_MODE_CAPTURING) {
                 rolljam_jam_stop(app);
-                rolljam_capture_start(app, sig);
+                if(!cap_started) {
+                    rolljam_capture_start(app, sig); // initial: Puffer-Reset + Start
+                    cap_started = true;
+                } else {
+                    rolljam_capture_resume(app); // Fortsetzen ohne Puffer-Reset
+                }
             }
         } else {
             if(app->rf_mode != RF_MODE_JAMMING) {
-                rolljam_capture_stop(app);
+                rolljam_capture_pause(app); // pausieren, Puffer behalten
                 rolljam_jam_start(app);
             }
         }

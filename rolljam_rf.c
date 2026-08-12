@@ -150,15 +150,28 @@ void rolljam_jam_stop(RollJamApp* app) {
     app->rf_mode = RF_MODE_IDLE;
 }
 
-void rolljam_capture_start(RollJamApp* app, RollJamSignal* sig) {
-    sig->count = 0;
-    sig->ready = false;
-    s_cap_sig = sig;
+// RX scharf schalten OHNE Puffer-Reset (Fortsetzung derselben Aufnahme nach Jam-Pause).
+void rolljam_capture_resume(RollJamApp* app) {
     rj_stop_current(app);
     subghz_devices_load_preset(app->device, FuriHalSubGhzPresetOok650Async, NULL);
     subghz_devices_set_frequency(app->device, app->frequency);
     subghz_devices_start_async_rx(app->device, rj_rx_cb, NULL);
     app->rf_mode = RF_MODE_CAPTURING;
+}
+
+// Neue Aufnahme in dieser Phase beginnen: Puffer zuruecksetzen, dann RX starten.
+void rolljam_capture_start(RollJamApp* app, RollJamSignal* sig) {
+    sig->count = 0;
+    sig->ready = false;
+    s_cap_sig = sig;
+    rolljam_capture_resume(app);
+}
+
+// RX anhalten, ohne die laufende Aufnahme aufzugeben: Puffer + s_cap_sig bleiben.
+void rolljam_capture_pause(RollJamApp* app) {
+    if(app->device && app->rf_mode == RF_MODE_CAPTURING)
+        subghz_devices_stop_async_rx(app->device);
+    app->rf_mode = RF_MODE_IDLE;
 }
 
 void rolljam_capture_stop(RollJamApp* app) {
